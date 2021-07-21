@@ -109,6 +109,7 @@
                     <th>Tanggal Terima</th>
                     <th>Pengirim Surat</th>
                     <th>Keterangan</th>
+                    <th>File</th>
                     <th>Aksi</th>
                   </tr>
                 </thead>
@@ -123,6 +124,11 @@
                       <td><?= $sm['tgl_terima']; ?></td>
                       <td><?= $sm['pengirim']; ?></td>
                       <td><?= $sm['keterangan']; ?></td>
+                      <td> 
+                        <a href="<?= base_url('assets/suratmasuk/'.$sm['file']); ?>" target="_blank">
+                        <img src="<?= base_url('assets/suratmasuk/'.$sm['file']); ?>" alt="" style="width:50px;height:50px;object-fit:cover;border-radius:8px">
+                        </a>
+                      </td>
                       <td>
                         <div class="form-button-action">
                           <a href="<?php echo base_url('kepalasekolah/suratmasuk_kepsek/detail/') . $sm['id_sm']; ?>">

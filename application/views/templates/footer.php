@@ -121,30 +121,25 @@
 <!-- Atlantis DEMO methods, don't include it in your project! -->
 <script src="<?= base_url('assets/atlantis-lite'); ?>/assets/js/setting-demo2.js"></script>
 <?php if ($title == "Dashboard") : ?>
+  <?php
+    $sk ="SELECT * FROM surat_keluar ";
+    $sm ="SELECT * FROM surat_masuk ";
+    $today = "where DATE_FORMAT(tgl_input, \"%Y-%m-%d\") = '".date("Y-m-d")."'";
+    $week = "where WEEK(NOW())=WEEK(tgl_input)";
+    $hari_ini['sk'] = $this->db->query($sk.$today)->num_rows();
+    $hari_ini['sm'] = $this->db->query($sm.$today)->num_rows();
+    $minggu_ini['sk'] = $this->db->query($sm.$week)->num_rows();
+    $minggu_ini['sm'] = $this->db->query($sm.$week)->num_rows();
+  ?>
   <script src="<?= base_url('assets/atlantis-lite'); ?>/assets/js/demo.js"></script>
   <script>
     Circles.create({
-      id: 'circles-1',
+      id: 'circles-sm',
       radius: 45,
-      value: 60,
-      maxValue: 100,
+      value: <?= $hari_ini['sm']; ?>,
+      maxValue: <?= $hari_ini['sk'] + $hari_ini['sm']; ?>,
       width: 7,
-      text: 5,
-      colors: ['#f1f1f1', '#FF9E27'],
-      duration: 400,
-      wrpClass: 'circles-wrp',
-      textClass: 'circles-text',
-      styleWrapper: true,
-      styleText: true
-    })
-
-    Circles.create({
-      id: 'circles-2',
-      radius: 45,
-      value: 70,
-      maxValue: 100,
-      width: 7,
-      text: 36,
+      text: <?= $hari_ini['sm']; ?>,
       colors: ['#f1f1f1', '#2BB930'],
       duration: 400,
       wrpClass: 'circles-wrp',
@@ -154,13 +149,13 @@
     })
 
     Circles.create({
-      id: 'circles-3',
+      id: 'circles-sk',
       radius: 45,
-      value: 40,
-      maxValue: 100,
+      value: <?= $hari_ini['sk']; ?>,
+      maxValue: <?= $hari_ini['sk'] + $hari_ini['sm']; ?>,
       width: 7,
-      text: 12,
-      colors: ['#f1f1f1', '#F25961'],
+      text: <?= $hari_ini['sk']; ?>,
+      colors: ['#f1f1f1', '#FF9E27'],
       duration: 400,
       wrpClass: 'circles-wrp',
       textClass: 'circles-text',
@@ -173,12 +168,12 @@
     var mytotalIncomeChart = new Chart(totalIncomeChart, {
       type: 'bar',
       data: {
-        labels: ["S", "M", "T", "W", "T", "F", "S", "S", "M", "T"],
+        labels: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"],
         datasets: [{
           label: "Total Income",
           backgroundColor: '#ff9e27',
           borderColor: 'rgb(23, 125, 255)',
-          data: [6, 4, 9, 5, 4, 6, 4, 3, 8, 10],
+          data: [6, 4, 9, 5, 4, 6, 4],
         }],
       },
       options: {

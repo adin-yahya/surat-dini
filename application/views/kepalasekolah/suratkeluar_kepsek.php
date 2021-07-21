@@ -117,6 +117,11 @@
                         <div class="form-button-action">
                           <a href="<?php echo base_url('kepalasekolah/suratkeluar_kepsek/detail/') . $sk['id_sk']; ?>">
                             <button class="btn btn-link btn-warning" type="button" data-toggle="tooltip" data-original-title="detail">
+                              <i class="fas fa-search"></i>
+                            </button>
+                          </a>
+                          <a href="<?php echo base_url('user/keluar/pdf/') . $sk['id_sk']; ?>">
+                            <button class="btn btn-link btn-warning" type="button" data-toggle="tooltip" data-original-title="Lihat Surat">
                               <i class="fas fa-file-alt"></i>
                             </button>
                           </a>

@@ -58,13 +58,12 @@ class Datauser extends CI_Controller
 	public function update()
 	{
 		$id = htmlspecialchars($this->input->post('id_user', true));
-		$nama = htmlspecialchars($this->input->post('nama', true));
+		$nama = htmlspecialchars($this->input->post('nama_user', true));
 		$username = htmlspecialchars($this->input->post('username', true));
 		$role = htmlspecialchars($this->input->post('role', true));
 		$telp = htmlspecialchars($this->input->post('telp', true));
 		$email = htmlspecialchars($this->input->post('email', true));
 		$password = htmlspecialchars($this->input->post('password', true));
-
 
 		$data = [
 			'nama_user' => $nama,

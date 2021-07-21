@@ -9,9 +9,9 @@ class Keluar extends CI_Controller
 		if (!$this->session->userdata('id')) {
 			redirect('login');
 		}
-		if ($this->session->userdata('role') == 2) {
-			redirect('kepsek');
-		}
+		// if ($this->session->userdata('role') == 2) {
+		// 	redirect('kepsek');
+		// }
 	}
 	
 	public function index()

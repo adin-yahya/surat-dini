@@ -180,7 +180,7 @@
                         <div class="col-md-12">
                           <div class="form-group">
                             <label>Nama</label>
-                            <input type="text" class="form-control" placeholder="Nama" name="nama">
+                            <input type="text" class="form-control" placeholder="nama_user" name="nama_user">
                           </div>
                         </div>
                       </div>
