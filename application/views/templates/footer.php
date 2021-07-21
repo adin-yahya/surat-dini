@@ -126,12 +126,59 @@
     $sm ="SELECT * FROM surat_masuk ";
     $today = "where DATE_FORMAT(tgl_input, \"%Y-%m-%d\") = '".date("Y-m-d")."'";
     $week = "where WEEK(NOW())=WEEK(tgl_input)";
+
+    $perWeek['sm'] = "SELECT DAYOFWEEK(DATE(tgl_input)) as day, COUNT(tgl_input) as count FROM surat_masuk GROUP BY DAYOFWEEK(DATE(tgl_input))";
+    $perWeek['sk'] = "SELECT DAYOFWEEK(DATE(tgl_input)) as day, COUNT(tgl_input) as count FROM surat_keluar GROUP BY DAYOFWEEK(DATE(tgl_input))";
+
     $hari_ini['sk'] = $this->db->query($sk.$today)->num_rows();
     $hari_ini['sm'] = $this->db->query($sm.$today)->num_rows();
-    $minggu_ini['sk'] = $this->db->query($sm.$week)->num_rows();
+
+    $minggu_ini['sk'] = $this->db->query($sk.$week)->num_rows();
     $minggu_ini['sm'] = $this->db->query($sm.$week)->num_rows();
+
+    $year['sm'] = "SELECT MONTH(tgl_input) as month , COUNT(tgl_input) as count FROM surat_masuk WHERE tgl_input >= NOW() - INTERVAL 1 YEAR GROUP BY month";
+    $year['sk'] = "SELECT MONTH(tgl_input) as month , COUNT(tgl_input) as count FROM surat_keluar WHERE tgl_input >= NOW() - INTERVAL 1 YEAR GROUP BY month";
+
+    $i=0;
+    $perWeekQuery['sm'] = $this->db->query($perWeek['sm'])->result();
+    $perWeekResult['sm'] = [];
+    for($i=0;$i<6;$i++){
+      $perWeekResult['sm'][$i] = 0;
+      foreach($perWeekQuery['sm'] as $arr){
+        $perWeekResult['sm'][$arr->day] = $arr->count;
+      }
+    }
+    $i=0;
+    $perWeekQuery['sk'] = $this->db->query($perWeek['sk'])->result();
+    $perWeekResult['sk'] = [];
+    for($i=0;$i<=6;$i++){
+      $perWeekResult['sk'][$i] = 0;
+      foreach($perWeekQuery['sk'] as $arr){
+        $perWeekResult['sk'][$arr->day] = $arr->count;
+      }
+    }
+    ksort($perWeekResult['sm']);
+    ksort($perWeekResult['sk']); 
+
+    $perYearQuery['sm'] = $this->db->query($year['sm'])->result();
+    $perYearResult['sm'] = [];
+    $perYearQuery['sk'] = $this->db->query($year['sk'])->result();
+    $perYearResult['sk'] = [];
+
+    $i=0;
+    for($i=1;$i<=12;$i++){
+      $perYearResult['sk'][$i] = 0;
+      foreach($perYearQuery['sk'] as $arr){
+        $perYearResult['sk'][$arr->month] = $arr->count;
+      }
+      $perYearResult['sm'][$i] = 0;
+      foreach($perYearQuery['sm'] as $arr){
+        $perYearResult['sm'][$arr->month] = $arr->count;
+      }
+    }
+    ksort($perYearResult['sm']);
+    ksort($perYearResult['sk']);
   ?>
-  <script src="<?= base_url('assets/atlantis-lite'); ?>/assets/js/demo.js"></script>
   <script>
     Circles.create({
       id: 'circles-sm',
@@ -168,12 +215,17 @@
     var mytotalIncomeChart = new Chart(totalIncomeChart, {
       type: 'bar',
       data: {
-        labels: ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"],
+        labels: ["Sabtu", "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat"],
         datasets: [{
-          label: "Total Income",
-          backgroundColor: '#ff9e27',
+          label: "Surat Masuk",
+          backgroundColor: '#63da67',
           borderColor: 'rgb(23, 125, 255)',
-          data: [6, 4, 9, 5, 4, 6, 4],
+          data: [<?= implode(',',$perWeekResult['sm']) ?>],
+        },{
+          label: "Surat Keluar",
+          backgroundColor: '#f8a1a6',
+          borderColor: 'rgb(23, 125, 255)',
+          data: [<?= implode(',',$perWeekResult['sk']) ?>],
         }],
       },
       options: {
@@ -201,6 +253,101 @@
         },
       }
     });
+    var ctx = document.getElementById('statisticsChart').getContext('2d');
+
+    var statisticsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        datasets: [ {
+          label: "Surat Keluar",
+          borderColor: '#f3545d',
+          pointBackgroundColor: 'rgba(243, 84, 93, 0.6)',
+          pointRadius: 0,
+          backgroundColor: 'rgba(243, 84, 93, 0.4)',
+          legendColor: '#f3545d',
+          fill: true,
+          borderWidth: 2,
+          data: [<?= implode(',',$perYearResult['sk']) ?>]
+        }, {
+          label: "Surat Masuk",
+          borderColor: '#2bb930',
+          pointBackgroundColor: '#9eeea0',
+          pointRadius: 0,
+          backgroundColor: '#9eeea0',
+          legendColor: '#2bb930',
+          fill: true,
+          borderWidth: 2,
+          data: [<?= implode(',',$perYearResult['sm']) ?>]
+        }]
+      },
+      options : {
+        responsive: true, 
+        maintainAspectRatio: false,
+        legend: {
+          display: false
+        },
+        tooltips: {
+          bodySpacing: 4,
+          mode:"nearest",
+          intersect: 0,
+          position:"nearest",
+          xPadding:10,
+          yPadding:10,
+          caretPadding:10
+        },
+        layout:{
+          padding:{left:5,right:5,top:15,bottom:15}
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              fontStyle: "500",
+              beginAtZero: false,
+              maxTicksLimit: 5,
+              padding: 10
+            },
+            gridLines: {
+              drawTicks: false,
+              display: false
+            }
+          }],
+          xAxes: [{
+            gridLines: {
+              zeroLineColor: "transparent"
+            },
+            ticks: {
+              padding: 10,
+              fontStyle: "500"
+            }
+          }]
+        }, 
+        legendCallback: function(chart) { 
+          var text = []; 
+          text.push('<ul class="' + chart.id + '-legend html-legend">'); 
+          for (var i = 0; i < chart.data.datasets.length; i++) { 
+            text.push('<li><span style="background-color:' + chart.data.datasets[i].legendColor + '"></span>'); 
+            if (chart.data.datasets[i].label) { 
+              text.push(chart.data.datasets[i].label); 
+            } 
+            text.push('</li>'); 
+          } 
+          text.push('</ul>'); 
+          return text.join(''); 
+        }  
+      }
+    });
+
+    var myLegendContainer = document.getElementById("myChartLegend");
+
+    // generate HTML legend
+    myLegendContainer.innerHTML = statisticsChart.generateLegend();
+
+    // bind onClick event to all LI-tags of the legend
+    var legendItems = myLegendContainer.getElementsByTagName('li');
+    for (var i = 0; i < legendItems.length; i += 1) {
+      legendItems[i].addEventListener("click", legendClickCallback, false);
+    }
 
     $('#lineChart').sparkline([105, 103, 123, 100, 95, 105, 115], {
       type: 'line',
